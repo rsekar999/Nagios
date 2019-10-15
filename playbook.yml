@@ -167,7 +167,7 @@
   tasks:
     - name: Install epel-release repository
       yum: 
-       name: epel-release 
+       name: httpd 
        state: present
     - name: Install nrpe, nagios-plugins-all
       yum: 
