@@ -1,159 +1,255 @@
----
-- hosts: Nagios-hosts
-  become: true
-  connection: local
-  vars:
-    gosu_ver: '1.9'
-    nagios_dl_file: 'nagios-{{ nagios_ver }}.tar.gz'
-    nagios_plugins_dl_file: 'nagios-plugins-{{ nagios_plugins_ver }}.tar.gz'
-    nagios_plugins_uri: 'https://nagios-plugins.org/download'
-    nagios_uri: 'https://assets.nagios.com/downloads/nagioscore/releases'
-  roles:
-  tasks:
-    - name: Installing apt-transport-https
-      apt:
-        name: "apt-transport-https"
-        state: "present"
+# ---
+# - hosts: Nagios-hosts
+#   become: true
+#   connection: Nagios-hosts
+#   vars:
+#     gosu_ver: '1.9'
+#     nagios_dl_file: 'nagios-{{ nagios_ver }}.tar.gz'
+#     nagios_plugins_dl_file: 'nagios-plugins-{{ nagios_plugins_ver }}.tar.gz'
+#     nagios_plugins_uri: 'https://nagios-plugins.org/download'
+#     nagios_uri: 'https://assets.nagios.com/downloads/nagioscore/releases'
+#   roles:
+#   tasks:
+#     - name: Installing apt-transport-https
+#       apt:
+#         name: "apt-transport-https"
+#         state: "present"
 
-    - name: Installing ca-certificates
-      apt:
-        name: "ca-certificates"
-        state: "latest"
+#     - name: Installing ca-certificates
+#       apt:
+#         name: "ca-certificates"
+#         state: "latest"
 
-    - name: Installing dumb-init
-      apt:
-        deb: "https://github.com/Yelp/dumb-init/releases/download/v1.0.2/dumb-init_1.0.2_amd64.deb"
+#     - name: Installing dumb-init
+#       apt:
+#         deb: "https://github.com/Yelp/dumb-init/releases/download/v1.0.2/dumb-init_1.0.2_amd64.deb"
 
-    - name: Installing gosu
-      get_url:
-        url: "https://github.com/tianon/gosu/releases/download/{{ gosu_ver }}/gosu-amd64"
-        dest: "/usr/local/bin/gosu"
-        mode: 0755
+#     - name: Installing gosu
+#       get_url:
+#         url: "https://github.com/tianon/gosu/releases/download/{{ gosu_ver }}/gosu-amd64"
+#         dest: "/usr/local/bin/gosu"
+#         mode: 0755
 
-    - name: Installing Pre-Reqs
-      apt:
-        name: "{{ item }}"
-        state: "present"
-        install_recommends: false
+#     - name: Installing Pre-Reqs
+#       apt:
+#         name: "{{ item }}"
+#         state: "present"
+#         install_recommends: false
+#       with_items:
+#          - 'apache2'
+#          - 'build-essential'
+#          - 'libapache2-mod-php7.0'
+#          - 'libgd-dev'
+#          - 'mailutils'
+#          - 'php-gd'
+#          - 'php'
+#          - 'postfix'
+#          - 'python-passlib'
+#          - 'runit'
+#          - 'unzip'
+
+#     - name: Adding Nagios User
+#       user:
+#        name: "nagios"
+#        state: "present"
+
+#     - name: Adding Nagios Group
+#       group:
+#        name: "nagcmd"
+#        state: "present"
+
+#     - name: Adding Nagios User To Groups
+#       user:
+#         name: "nagios"
+#         group: "{{ item }}"
+#         append: yes
+#       with_items:
+#         - 'nagios'
+#         - 'nagcmd'
+
+#     - name: Downloading Nagios Core
+#       get_url:
+#         url: "{{ nagios_uri }}/{{ nagios_dl_file }}"
+#         dest: "/tmp/{{ nagios_dl_file }}"
+
+#     - name: Extracting Nagios Core
+#       unarchive:
+#         src: "/tmp/{{ nagios_dl_file }}"
+#         dest: "/opt"
+
+#     - name: Downloading Nagios Plugins
+#       get_url:
+#         url: "{{ nagios_plugins_uri }}/{{ nagios_plugins_dl_file }}"
+#         dest: "/tmp/{{ nagios_plugins_dl_file }}"
+
+#     - name: Extracting Nagios Plugins
+#       unarchive:
+#         src: "/tmp/{{ nagios_plugins_dl_file }}"
+#         dest: "/opt"
+
+#     - name: Configuring Nagios Core
+#       command: "./configure --with-command-group=nagcmd --with-mail=/usr/bin/sendmail --with-httpd-conf=/etc/apache2/"
+#       args:
+#         chdir: "/opt/nagios-{{ nagios_ver }}"
+
+#     - name: Building Nagios Core
+#       make:
+#         chdir: "/opt/nagios-{{ nagios_ver }}"
+#         target: "{{ item }}"
+#       with_items:
+#         - 'all'
+#         - 'install'
+#         - 'install-init'
+#         - 'install-config'
+#         - 'install-commandmode'
+#         - 'install-webconf'
+
+#     - name: Copying Nagios Eventhandlers
+#       command: "cp -R /opt/nagios-{{ nagios_ver }}/contrib/eventhandlers/ /usr/local/nagios/libexec/"
+
+#     - name: Ensuring Nagios Permissions
+#       file:
+#         path: "/usr/local/nagios/eventhandlers"
+#         state: "directory"
+#         owner: "nagios"
+#         group: "nagios"
+#         recurse: yes
+
+#     - name: Creating Nagios Apache Symlink
+#       file:
+#         src: "/etc/apache2/nagios.conf"
+#         dest: "/etc/apache2/sites-available/nagios.conf"
+#         state: "link"
+
+#     - name: Enabling Nagios Web Site
+#       command: "a2ensite nagios"
+
+#     - name: Enabling Apache Modules
+#       apache2_module:
+#         name: "{{ item }}"
+#         state: "present"
+#       with_items:
+#         - 'rewrite'
+#         - 'cgi'
+
+#     - name: Adding Default Nagios Web Login
+#       htpasswd:
+#         path: "/usr/local/nagios/etc/htpasswd.users"
+#         name: "{{ nagiosadmin_username }}"
+#         password: "{{ nagiosadmin_password }}"
+
+#     - name: Configuring Nagios Plugins
+#       command: "./configure --with-nagios-user=nagios --with-nagios-group=nagios"
+#       args:
+#         chdir: "/opt/nagios-plugins-{{ nagios_plugins_ver }}"
+
+#     - name: Building Nagios Plugins
+#       make:
+#         chdir: "/opt/nagios-plugins-{{ nagios_plugins_ver }}"
+#         target: "{{ item }}"
+#       with_items:
+#         - 'install'
+
+#     - name: Cleaning Up
+#       file:
+#         path: "/tmp/{{ item }}"
+#         state: "absent"
+#       with_items:
+#         - '{{ nagios_dl_file }}'
+#         - '{{ nagios_plugins_dl_file }}'
+
+
+- name: Playbook for configuring nagios client(s)
+    hosts: Nagios-hosts
+    remote_user: root
+    
+    vars:
+      nagios_server: 172.31.<yambe:breadcrumb self="CentOS 7.x nagios server and client configuration ansible playbook">CentOS 7.x nagios|CentOS 7.x nagios</yambe:breadcrumb>95.5
+
+    tasks:
+    - name: Install epel-release repository
+      yum: name=epel-release state=present
+    
+    - name: Install nrpe, nagios-plugins-all
+      yum: name={{item}} state=present
       with_items:
-         - 'apache2'
-         - 'build-essential'
-         - 'libapache2-mod-php7.0'
-         - 'libgd-dev'
-         - 'mailutils'
-         - 'php-gd'
-         - 'php'
-         - 'postfix'
-         - 'python-passlib'
-         - 'runit'
-         - 'unzip'
+        - nrpe
+        - nagios-plugins-all
+        - openssl
 
-    - name: Adding Nagios User
-      user:
-       name: "nagios"
-       state: "present"
+    - name: Configure nagios server IP in nrpe configuration file
+      lineinfile: 
+        dest: /etc/nagios/nrpe.cfg
+        regexp: allowed_hosts=
+        line: allowed_hosts=127.0.0.1,{{nagios_server}} 
 
-    - name: Adding Nagios Group
-      group:
-       name: "nagcmd"
-       state: "present"
+    - name: Start nrpe service and enable it on startup
+      service: name=nrpe state=restarted enabled=yes
 
-    - name: Adding Nagios User To Groups
-      user:
-        name: "nagios"
-        group: "{{ item }}"
-        append: yes
+  
+  - name: Playbook for configuring nagios server including clients and client services monitoring
+    hosts: nagios-server
+    remote_user: root
+
+    vars:
+      nagios_alert_email_id: rajaskr999@gmail.com
+      nagiosadmin_password: nagiosadmin
+      nagios_client_details:
+        - { hostname: "Server", alias: "test1", address: 172.31.95.5, services: [ "ping", "ssh" ] }  
+        - { hostname: "ClinetServer", alias: "web1", address: 172.31.95.249 , services: [ "ping", "ssh", "http", "nrpe_check_load" ] }  
+        # - { hostname: "windows10", alias: "windows10", address: 192.168.2.32, services: [ "ping", "nrpe_alias_cpu" ] }  
+
+
+    tasks:
+    - name: Install epel-release repository
+      yum: name=epel-release state=present
+    
+    - name: Install nagios, nagios-plugins-all and nrpe packages
+      yum: name={{item}} state=present
       with_items:
-        - 'nagios'
-        - 'nagcmd'
+      - nagios
+      - nagios-plugins-all
+      - nrpe 
+      - nagios-plugins-nrpe
 
-    - name: Downloading Nagios Core
-      get_url:
-        url: "{{ nagios_uri }}/{{ nagios_dl_file }}"
-        dest: "/tmp/{{ nagios_dl_file }}"
+    - name: Configure desried email ID in contacts
+      lineinfile: 
+        dest: /etc/nagios/objects/contacts.cfg
+        regexp: email
+        line: email {{nagios_alert_email_id}} 
 
-    - name: Extracting Nagios Core
-      unarchive:
-        src: "/tmp/{{ nagios_dl_file }}"
-        dest: "/opt"
+    - name: Copy commands.cfg file with check_nrpe command
+      copy: src=commands.cfg dest=/etc/nagios/objects/commands.cfg owner=nagios group=nagios mode=755
 
-    - name: Downloading Nagios Plugins
-      get_url:
-        url: "{{ nagios_plugins_uri }}/{{ nagios_plugins_dl_file }}"
-        dest: "/tmp/{{ nagios_plugins_dl_file }}"
+    - name: Create nagiosadmin user for httpd access
+      shell: htpasswd -cb /etc/nagios/passwd nagiosadmin {{nagiosadmin_password}}
 
-    - name: Extracting Nagios Plugins
-      unarchive:
-        src: "/tmp/{{ nagios_plugins_dl_file }}"
-        dest: "/opt"
+    - name: Make sure httpd is installed
+      yum: name=httpd state=present
 
-    - name: Configuring Nagios Core
-      command: "./configure --with-command-group=nagcmd --with-mail=/usr/bin/sendmail --with-httpd-conf=/etc/apache2/"
-      args:
-        chdir: "/opt/nagios-{{ nagios_ver }}"
-
-    - name: Building Nagios Core
-      make:
-        chdir: "/opt/nagios-{{ nagios_ver }}"
-        target: "{{ item }}"
+    - name: Start nagios, httpd services and enable them on startup
+      service: name={{item}} state=restarted enabled=yes
       with_items:
-        - 'all'
-        - 'install'
-        - 'install-init'
-        - 'install-config'
-        - 'install-commandmode'
-        - 'install-webconf'
+        - httpd
+        - nagios
 
-    - name: Copying Nagios Eventhandlers
-      command: "cp -R /opt/nagios-{{ nagios_ver }}/contrib/eventhandlers/ /usr/local/nagios/libexec/"
+    - name: Set setuid permissions on /usr/bin/ping to allow nagios user to execute ping
+      file: dest=/usr/bin/ping mode=04755
 
-    - name: Ensuring Nagios Permissions
-      file:
-        path: "/usr/local/nagios/eventhandlers"
-        state: "directory"
-        owner: "nagios"
-        group: "nagios"
-        recurse: yes
+    - name: Configure nagios to use clients.conf file
+      lineinfile: 
+        dest: /etc/nagios/nagios.cfg
+        insertafter: cfg_dir=.etc.nagios.conf.d
+        line: cfg_file=/etc/nagios/servers/clients.conf
 
-    - name: Creating Nagios Apache Symlink
-      file:
-        src: "/etc/apache2/nagios.conf"
-        dest: "/etc/apache2/sites-available/nagios.conf"
-        state: "link"
+    - name: Create servers folder
+      file: dest=/etc/nagios/servers owner=nagios group=nagios mode=755 state=directory
+ 
+    - name: Configure server to monitor clients
+      template: src=nagios-clients.j2 dest=/etc/nagios/servers/clients.conf owner=nagios group=nagios mode=755
 
-    - name: Enabling Nagios Web Site
-      command: "a2ensite nagios"
+    - name: Restart nagios on server to use new configuration
+      service: name=nagios state=restarted   
 
-    - name: Enabling Apache Modules
-      apache2_module:
-        name: "{{ item }}"
-        state: "present"
-      with_items:
-        - 'rewrite'
-        - 'cgi'
 
-    - name: Adding Default Nagios Web Login
-      htpasswd:
-        path: "/usr/local/nagios/etc/htpasswd.users"
-        name: "{{ nagiosadmin_username }}"
-        password: "{{ nagiosadmin_password }}"
 
-    - name: Configuring Nagios Plugins
-      command: "./configure --with-nagios-user=nagios --with-nagios-group=nagios"
-      args:
-        chdir: "/opt/nagios-plugins-{{ nagios_plugins_ver }}"
-
-    - name: Building Nagios Plugins
-      make:
-        chdir: "/opt/nagios-plugins-{{ nagios_plugins_ver }}"
-        target: "{{ item }}"
-      with_items:
-        - 'install'
-
-    - name: Cleaning Up
-      file:
-        path: "/tmp/{{ item }}"
-        state: "absent"
-      with_items:
-        - '{{ nagios_dl_file }}'
-        - '{{ nagios_plugins_dl_file }}'
