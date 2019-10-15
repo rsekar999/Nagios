@@ -13,7 +13,7 @@ ENV NAGIOSADMIN_USERNAME="nagiosadmin" \
 
 COPY hosts hosts
 # Run Ansible playbook
-RUN cat /home/centos/Nagios/hosts
+RUN cat hosts
 RUN ansible-playbook -i hosts -c local /playbook.yml \
   --extra-vars "nagiosadmin_password=$NAGIOSADMIN_PASSWORD \
   nagiosadmin_username=$NAGIOSADMIN_USERNAME \
