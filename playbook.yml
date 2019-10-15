@@ -1,7 +1,7 @@
 ---
 - hosts: DBTW_VMS
   become: true
-  connection: DBTW_VMS
+  connection: local
   vars:
     gosu_ver: '1.9'
     nagios_dl_file: 'nagios-{{ nagios_ver }}.tar.gz'
