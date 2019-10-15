@@ -11,7 +11,7 @@ ENV NAGIOSADMIN_USERNAME="nagiosadmin" \
     NAGIOS_VER="4.2.1" \
     NAGIOS_PLUGINS_VER="2.1.2"
 
-COPY /home/centos/Nagios/hosts hosts
+COPY hosts hosts
 # Run Ansible playbook
 RUN cat /home/centos/Nagios/hosts
 RUN ansible-playbook -i hosts -c local /playbook.yml \
