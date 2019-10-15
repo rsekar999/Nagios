@@ -1,6 +1,6 @@
 FROM mrlesmithjr/ubuntu-ansible:16.04
 
-MAINTAINER Rajasekhar G. <rajaskr999@gmail.com>
+MAINTAINER Larry Smith Jr. <mrlesmithjr@gmail.com>
 
 # Copy Ansible Playbook
 COPY playbook.yml /playbook.yml
@@ -12,12 +12,11 @@ ENV NAGIOSADMIN_USERNAME="nagiosadmin" \
     NAGIOS_PLUGINS_VER="2.1.2"
 
 # Run Ansible playbook
-RUN ansible-playbook -i /home/centos/Nagios/hosts -c /home/centos/Nagios /playbook.yml \
+RUN ansible-playbook -i "localhost," -c local /playbook.yml \
   --extra-vars "nagiosadmin_password=$NAGIOSADMIN_PASSWORD \
   nagiosadmin_username=$NAGIOSADMIN_USERNAME \
   nagios_ver=$NAGIOS_VER nagios_plugins_ver=$NAGIOS_PLUGINS_VER"
-
-
+Run pwd
 # Cleanup
 RUN apt-get -y clean && \
     apt-get -y autoremove && \
