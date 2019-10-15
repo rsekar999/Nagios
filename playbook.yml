@@ -184,12 +184,12 @@
         line: allowed_hosts=127.0.0.1,{{nagios_server}} 
 
    - name: Start nrpe service and enable it on startup
-      service: name=nrpe state=restarted enabled=yes
+     service: name=nrpe state=restarted enabled=yes
 
   
    - name: Playbook for configuring nagios server including clients and client services monitoring
-    hosts: nagios-server
-    remote_user: root
+     hosts: nagios-server
+     remote_user: root
 
     vars:
       nagios_alert_email_id: rajaskr999@gmail.com
@@ -201,10 +201,10 @@
 
 
     tasks:
-    - name: Install epel-release repository
+     - name: Install epel-release repository
       yum: name=epel-release state=present
     
-    - name: Install nagios, nagios-plugins-all and nrpe packages
+     - name: Install nagios, nagios-plugins-all and nrpe packages
       yum: name={{item}} state=present
       with_items:
       - nagios
