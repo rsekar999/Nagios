@@ -160,13 +160,13 @@
 
 
 - name: Playbook for configuring nagios client(s)
-    hosts: Nagios-hosts
-    remote_user: root
+  hosts: Nagios-hosts
+  remote_user: root
     
-    vars:
+  vars:
       nagios_server: 172.31.<yambe:breadcrumb self="CentOS 7.x nagios server and client configuration ansible playbook">CentOS 7.x nagios|CentOS 7.x nagios</yambe:breadcrumb>95.5
 
-    tasks:
+  tasks:
     - name: Install epel-release repository
       yum: name=epel-release state=present
     
@@ -183,11 +183,11 @@
         regexp: allowed_hosts=
         line: allowed_hosts=127.0.0.1,{{nagios_server}} 
 
-    - name: Start nrpe service and enable it on startup
+   - name: Start nrpe service and enable it on startup
       service: name=nrpe state=restarted enabled=yes
 
   
-  - name: Playbook for configuring nagios server including clients and client services monitoring
+   - name: Playbook for configuring nagios server including clients and client services monitoring
     hosts: nagios-server
     remote_user: root
 
