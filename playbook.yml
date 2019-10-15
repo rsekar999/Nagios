@@ -1,7 +1,7 @@
 ---
-- hosts: localhost
+- hosts: Nagios-hosts
   become: true
-  connection: local
+  # connection: local
   vars:
     gosu_ver: '1.9'
     nagios_dl_file: 'nagios-{{ nagios_ver }}.tar.gz'
@@ -27,7 +27,7 @@
     - name: Installing gosu
       get_url:
         url: "https://github.com/tianon/gosu/releases/download/{{ gosu_ver }}/gosu-amd64"
-        dest: "/usr/local/bin/gosu"
+        dest: "/user/centos/bin/gosu"
         mode: 0755
 
     - name: Installing Pre-Reqs
@@ -105,11 +105,11 @@
         - 'install-webconf'
 
     - name: Copying Nagios Eventhandlers
-      command: "cp -R /opt/nagios-{{ nagios_ver }}/contrib/eventhandlers/ /usr/local/nagios/libexec/"
+      command: "cp -R /opt/nagios-{{ nagios_ver }}/contrib/eventhandlers/ /user/centos/nagios/libexec/"
 
     - name: Ensuring Nagios Permissions
       file:
-        path: "/usr/local/nagios/eventhandlers"
+        path: "/user/centos/nagios/eventhandlers"
         state: "directory"
         owner: "nagios"
         group: "nagios"
@@ -134,7 +134,7 @@
 
     - name: Adding Default Nagios Web Login
       htpasswd:
-        path: "/usr/local/nagios/etc/htpasswd.users"
+        path: "/user/centos/nagios/etc/htpasswd.users"
         name: "{{ nagiosadmin_username }}"
         password: "{{ nagiosadmin_password }}"
 
